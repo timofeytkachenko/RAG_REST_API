@@ -1,0 +1,28 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_data:/qdrant/storage:z
+    environment:
+      - QDRANT__STORAGE__SNAPSHOT_PATH=/qdrant/storage/snapshots
+      - QDRANT__STORAGE__COLLECTIONS_PATH=/qdrant/storage/collections
+    restart: unless-stopped
+
+  rag_api:
+    build: .
+    container_name: rag_api
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./state:/app/state
+      - ./qdrant_data:/app/qdrant_data
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+    restart: unless-stopped
