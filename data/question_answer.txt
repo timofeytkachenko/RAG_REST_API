@@ -1,0 +1,407 @@
+question: Is it possible to sit not at a table, but, for example, on a sofa?
+answer: No, a table and a chair are required; the position must be stable.
+
+question: Is it possible to take unscheduled breaks?
+answer: No, breaks are not provided, except in emergency situations.
+
+question: Can I have a snack during the test?
+answer: No, eating is prohibited during the entire exam.
+
+question: Can I go to the toilet during the exam?
+answer: Only allowed in emergency cases; time is not compensated and the camera must record your absence/return.
+
+question: Is mechanical keyboard/ergonomic mouse allowed?
+answer: Yes, if they are regular HID devices without macros.
+
+question: Can I speak out loud when solving problems?
+answer: No, talking and speaking out loud is prohibited.
+
+question: Can I open the window for ventilation?
+answer: Yes, as long as you stay in frame and the noise level is acceptable.
+
+question: Is it possible to use a second monitor?
+answer: No, only one active screen is allowed.
+
+question: Are headphones or earphones allowed?
+answer: No, headphones are not allowed unless approved for availability in advance.
+
+question: Should hands and face be kept in frame?
+answer: Yes, hands, shoulders and face should be visible at all times.
+
+question: Is it possible to use an external microphone?
+answer: Yes, if it was checked during the system check.
+
+question: Is it okay to cover your ears with a hat or hood?
+answer: No, your ears should be open and visible to the camera.
+
+question: Is it possible to use a graphic tablet?
+answer: Only if it is provided for in the assignments and permitted in advance.
+
+question: Is it okay to keep a bottle of water on the table?
+answer: Yes, but only a clear one without labels; show it to the proctor before the test.
+
+question: Is it possible to use a smartwatch during the exam?
+answer: No, any wearable gadgets are prohibited.
+
+question: Can I answer a call on my mobile?
+answer: No, the phone must be turned off and put away until the end of the exam.
+
+question: Is it possible to turn on the air conditioner or fan?
+answer: Yes, if it does not interfere with hearing or obstruct the view.
+
+question: Is it possible to change the position of the webcam during the test?
+answer: Only at the direction of the proctor, otherwise keep a fixed angle. Machine Translated by Google.
+
+question: Is it possible to take the exam in a public place (cafe, coworking)?
+answer: No, a private room without strangers is required.
+
+question: Is a table lamp allowed?
+answer: Yes, provided that the face is sufficiently and evenly illuminated.
+
+question: Should transparent windows and glass doors be covered?
+answer: Yes, they should be covered with curtains/blinds for privacy.
+
+question: Should I warn my family in advance about the exam time?
+answer: Yes, to avoid interruptions and surprises.
+
+question: Is it okay to move around a little on a chair?
+answer: Yes, but don't go out of frame or get distracted for too long.
+
+question: Are pets allowed in the room?
+answer: No, eliminate potential distractions.
+
+question: Should the door to the room be closed?
+answer: Yes, to prevent strangers from entering.
+
+question: Is it possible to switch between tabs?
+answer: No, switching between tabs is prohibited and is recorded by the system.
+
+question: Is it possible to keep a table clock on the table?
+answer: Simple clocks without "smart" functions are acceptable.
+
+question: Should I close other programs?
+answer: Yes, just leave the exam app/browser running.
+
+question: Is it okay to leave posters and cheat sheets on the walls?
+answer: No, remove any educational materials from the visible area.
+
+question: Is it okay for someone to enter the room during the test?
+answer: No, no one should enter; if there is a violation, please report it to the proctor.
+
+question: Is it possible to sit with your back to the window?
+answer: It is acceptable if your face is clearly lit and visible.
+
+question: What should I do if the test application freezes?
+answer: Immediately write to the proctor in the chat and follow his instructions; do not restart without permission.
+
+question: Can I use a laptop stand?
+answer: Yes, as long as the camera view remains correct.
+
+question: What should I do if my internet connection is temporarily interrupted?
+answer: Restore the connection as soon as possible and notify the proctor; the test may be paused.
+
+question: Is it possible to use VPN during the exam?
+answer: No, it is against the rules and may affect stability. Machine Translated by Google.
+
+question: Is it possible to update the OS or drivers during the test?
+answer: Notify the proctor; as instructed, restart the audio device/service.
+
+question: Is it possible to use the "Do not disturb" mode in the OS?
+answer: Yes, turn it on before starting so that notifications do not disturb.
+
+question: Is it possible to use a paper draft?
+answer: One blank sheet is allowed, shown on camera before the test; after the test it must be destroyed.
+
+question: Is it possible to keep textbooks on the table for confidence?
+answer: No, any auxiliary materials are prohibited.
+
+question: Is it possible to communicate with anyone other than the proctor during the at Home exam?
+answer: No, any contact with anyone other than the proctor is prohibited (exam).
+
+question: Is it possible to talk to the proctor about the content of the tasks?
+answer: No, only technical questions about the procedure are allowed.
+
+question: Is it possible to use translators or dictionaries?
+answer: No, electronic and paper reference books are prohibited.
+
+question: Do I need to show a room overview before starting?
+answer: Yes, the proctor will ask to show 360°: table, walls, floor.
+
+question: Is it possible to change the device during the test?
+answer: No, the device is approved during check-in and should not be changed.
+
+question: Is it possible to use speech-to-text dictation?
+answer: No, any speech recognition systems are prohibited.
+
+question: Should I connect the power supply to the laptop in advance?
+answer: Yes, it is better to avoid working on battery power to avoid shutdowns.
+
+question: Is it possible to use unauthorized materials for the at Home exam?
+answer: No, books, notes, recordings, mobile devices and smart watches are prohibited (exam).
+
+question: Is it possible to get help from third parties online?
+answer: No, this is a serious violation and will lead to cancellation.
+
+question: Is it possible to use paper stickers on the monitor?
+answer: No, remove the stickers and hints.
+
+question: Is it possible to record the screen or take photos?
+answer: No, photos/ videos/screenshots are strictly prohibited.
+
+question: Is it possible to paste answers from the clipboard?
+answer: No, copying/ pasting is prohibited. Machine Translated by Google.
+
+question: Is it okay to look away during the exam at Home?
+answer: Avoid looking away for long periods of time and walking out of frame (exam).
+
+question: Can I use headphones for the exam?
+answer: Yes, speaking and reading out loud outside of Speaking can result in a failure (of the exam).
+
+question: What note-taking materials are acceptable for the exam?
+answer: Whiteboard/foil with marker, erasable after the test (exam).
+
+question: Should transparent windows/doors be closed (exam)?
+answer: Yes, transparent surfaces are closed; walls - without materials (exam).
+
+question: Is it possible to enter after the start of the listening exam?
+answer: No, entry after the start of the listening exam is prohibited.
+
+question: Is it possible to take the exam without matching ticket and certificate data?
+answer: No, the data must match, otherwise admission is not possible (exam).
+
+question: Are there any breaks during the exam?
+answer: No, leaving the classroom is not compensated and is not encouraged (exam).
+
+question: Is it possible to transfer the exam between levels/types/centers?
+answer: No, transfer between types, levels and centers is prohibited (exam).
+
+question: What to do if the exam app freezes?
+answer: Notify the proctor; he will pause/help restart (the exam).
+
+question: Is it possible to take breaks for the exam at Home?
+answer: No, unscheduled breaks are not allowed (exam).
+
+question: Is it possible to whisper to yourself during the exam at Home?
+answer: No, this is a violation and can lead to cancellation (of the exam).
+
+question: Do I need to be alone in the room for the at Home exam?
+answer: Yes, no one should enter; public spaces are prohibited (exam).
+
+question: Should I start check-in early (exam)?
+answer: Yes, about 15 minutes before the test (exam) starts.
+
+question: Will I get compensation for being late for the speaking exam?
+answer: No, I will not get compensation for being late (for the exam).
+
+question: Is it possible to take the at Home exam in a coworking space/cafe?
+answer: No, it is prohibited; a private closed room (exam) is required.
+
+question: Can I use a second monitor for the at Home exam?
+answer: No, only one screen (exam) is allowed. Machine Translated by Google.
+
+question: How to prepare lighting for the camera?
+answer: Provide even light without harsh shadows (exam).
+
+question: Should I check my camera and microphone beforehand?
+answer: Yes, make sure they are working properly (exam).
+
+question: Is it necessary to prepare a well-lit workplace?
+answer: No, additional devices are only allowed with approval (exam).
+
+question: Do I need to do a system check before the exam day?
+answer: Yes, do a hardware and software check beforehand (exam).
+
+question: Is it okay to keep personal items nearby?
+answer: Only the minimum allowed; remove all unnecessary items (exam).
+
+question: Should I close unnecessary tabs and programs in advance?
+answer: Yes, leave only those needed for the test (exam).
+
+question: Should I use only the exam interface?
+answer: Yes, and do not open any extraneous windows (exam).
+
+question: Should I connect my laptop to the network/UPS?
+answer: Yes, it will reduce the risk of disconnection (exam).
+
+question: Is it possible to take screenshots/photos of the screen?
+answer: No, this is a violation (exam).
+
+question: Should I disable auto-updates?
+answer: Yes, to avoid unexpected reboots (exam).
+
+question: Should I warn my family not to come in?
+answer: Yes, warn them about the exam time (exam).
+
+question: Should the door be closed before the test starts?
+answer: Yes, to prevent outsiders from entering (exam).
+
+question: Is it worth testing your internet connection in advance?
+answer: Yes, network stability is critical (exam).
+
+question: How to prepare the table surface?
+answer: Remove unnecessary items, leave only permitted items (exam).
+
+question: Is it possible to have someone present in the room?
+answer: No, you must be alone (exam).
+
+question: Is it possible to connect untested external devices on the day of the test?
+answer: No, check/approve all devices in advance (exam).
+
+question: Is it possible to have a snack/drink coffee during the test?
+answer: No, it is prohibited (exam).
+
+question: Is it possible to keep notes on hand just in case?
+answer: No, any notes are prohibited (exam). Machine Translated by Google.
+
+question: Is it possible to leave open correspondence on a second device?
+answer: No, any second devices and communications are prohibited.
+
+question: Can I use browser extensions (adblock, translator)?
+answer: No, extensions should be disabled before starting.
+
+question: What to do if the lighting is insufficient?
+answer: Add a light source and notify the proctor if necessary (exam).
+
+question: Is it possible to adjust the screen brightness?
+answer: Yes, as long as the text remains readable and you don't go out of frame.
+
+question: Can I use a screen magnifier?
+answer: Only as an accessibility tool with prior permission.
+
+question: Is it possible to keep a handkerchief/napkins nearby?
+answer: Yes, it is allowed, provided that you show it to the proctor before the start.
+
+question: Can I use an external timer/alarm?
+answer: No, external timers are not allowed.
+
+question: Is it possible to run remote access applications (TeamViewer, etc.)?
+answer: No, they must be closed and removed from startup.
+
+question: Can I request to change the start time on the day of the exam?
+answer: No, changing the time on the day of the test is not available.
+
+question: Is it okay to cover your face with your hand/hair?
+answer: No, your face should be fully visible.
+
+question: Is it okay to keep a pencil and eraser on the table?
+answer: Yes, as long as they are clean and have no clues.
+
+question: Is it possible to use a phone as a camera without permission?
+answer: No, use only approved devices (exam).
+
+question: Is it possible to get up to warm up?
+answer: No, you can't get up without permission.
+
+question: Is it allowed to use an external webcam on a tripod?
+answer: Yes, as long as it provides a stable view and is agreed upon.
+
+question: Is it allowed to use programs with hot macro keys?
+answer: No, macros are prohibited.
+
+question: Is it possible to keep glasses in a case on the table?
+answer: Yes, it is permissible.
+
+question: Is it possible to use the translator on a second monitor outside the frame?
+answer: No, any second screens are prohibited.
+
+question: Is it possible to moderate the volume of system sounds?
+answer: Yes, but do not turn off the microphone/camera.. Machine Translated by Google.
+
+question: Can I have prescription medications on hand?
+answer: Yes, if needed and with advance notice; present upon request.
+
+question: Can I bring squared sheets as a draft?
+answer: A blank sheet without markings/ notes is allowed; follow the rules of the specific exam.
+
+question: Is it possible to use the microphone noise filter?
+answer: Yes, the system noise suppressor is allowed if it does not interfere with proctoring.
+
+question: Is it possible to keep parallel notes in an electronic notebook?
+answer: No, electronic notes are not allowed; use the allowed draft.
+
+question: Is it possible to save a draft after the exam?
+answer: No, the draft must be destroyed according to the instructions.
+
+question: Is it possible to keep a ruler on the table?
+answer: It is only allowed if the rules of a particular section allow it.
+
+question: Is it possible to open the OS calculator on another desktop in advance?
+answer: No, it is forbidden to open third-party applications.
+
+question: Is it possible to ask for a hint on understanding the instructions?
+answer: It is possible to rephrase the question about the procedure; the content of the tasks cannot be discussed.
+
+question: Is it possible to use math tables?
+answer: No, unless explicitly permitted by the section instructions.
+
+question: What should you do if your neighbors are noisy?
+answer: Notify the proctor and try to continue while minimizing the noise.
+
+question: Is it possible to change the interface language during the test?
+answer: Not recommended; do it before the start to avoid mistakes.
+
+question: Is it okay to keep an open bottle of coffee/tea?
+answer: No, drinks are generally prohibited; only water in a clear bottle without a label is allowed.
+
+question: Is it possible to use a wireless headset only as a microphone?
+answer: No, headsets are generally prohibited.
+
+question: Is it possible to turn on the monitor's power saving mode?
+answer: Avoid auto-off; turn off "sleep" during the exam.
+
+question: Is it possible to cover the webcam between sections?
+answer: No, the camera must remain open.
+
+question: Is it possible to change a chair on wheels?
+answer: Yes, if you do not leave the frame and do not create noise.
+
+question: Is it possible to exit full-screen mode?
+answer: Yes, if the camera correctly captures the face and hands.
+
+question: Is it possible to keep a block of paper nearby?
+answer: Only one sheet approved as a draft is allowed.
+
+question: Is it possible to correspond in the support chat instead of the proctor?
+answer: Use the built-in channel; external chats are prohibited.
+
+question: Is it possible to sit closer/further from the camera during the test?
+answer: Maintain a constant position; changes are only allowed when instructed by the proctor.
+
+question: Can I use a wireless presentation "clicker"?
+answer: No, third-party input devices are prohibited.
+
+question: Is it possible to keep the windows slightly open for ventilation?
+answer: Yes, if it does not create noise; if the sound gets worse, close them.
+
+question: Is it possible to ask the proctor to repeat the instructions?
+answer: Yes, in terms of procedure - yes; in terms of the content of the tasks - no.
+
+question: Is it possible to turn on the keyboard backlight to maximum?
+answer: Yes, if it does not interfere with the view.
+
+question: Is it possible to use keyboard overlays with hints?
+answer: No, any hints are prohibited.
+
+question: Is it possible to keep a glass carafe of water in the frame?
+answer: Only a transparent vessel without labels or markings is allowed.
+
+question: Can I use an e-ink tablet to take notes?
+answer: No, electronic devices for taking notes are prohibited.
+
+question: Is it okay to keep a phone charger handy?
+answer: Yes, but the phone itself should be put away and turned off.
+
+question: Is it possible to use autocorrect in a text field?
+answer: If it is a standard platform function, it is possible; external utilities are prohibited.
+
+question: Is it possible to use Windows Narrator?
+answer: Only if available and approved by the organizer.
+
+question: Is it okay to keep a mirror in a room?
+answer: It is acceptable if it is out of frame and does not cause glare; if in doubt, remove it.
+
+question: Is it possible to change the layout while typing a special character?
+answer: It is allowed if it does not result in auto-translation/hints.
+
+question: Is it possible to move the camera tripod when the lighting changes?
+answer: Only after notification and with the permission of the proctor. Machine Translated by Google.

@@ -15,7 +15,7 @@ from langchain_qdrant import QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient
 
-from gemma import GemmaEmbeddings  # user-provided
+from gemma import GemmaEmbeddings
 
 # -----------------------
 # Logging
@@ -109,7 +109,10 @@ def load_docs_from_path(path: Path) -> List[Document]:
 def new_text_splitter() -> RecursiveCharacterTextSplitter:
     """Create a robust recursive splitter for mixed prose/code."""
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, chunk_overlap=50, add_start_index=True, separators=["\n\n", "\n", " ", ""]
+        chunk_size=500,
+        chunk_overlap=50,
+        add_start_index=True,
+        separators=["\n\n", "\n", " ", ""],
     )
     logger.debug("Initialized text splitter: chunk_size=500 overlap=50")
     return splitter
@@ -122,7 +125,9 @@ def get_expected_dimension() -> int:
         return GOOGLE_GEMMA_DIMENSION
     if provider == "openai":
         return OPENAI_DIMENSION
-    raise ValueError(f"Unsupported EMBED_PROVIDER: {EMBED_PROVIDER}. Use 'openai' or 'google'")
+    raise ValueError(
+        f"Unsupported EMBED_PROVIDER: {EMBED_PROVIDER}. Use 'openai' or 'google'"
+    )
 
 
 def get_embeddings():
@@ -135,7 +140,9 @@ def get_embeddings():
         return GemmaEmbeddings()
     if provider == "openai":
         return OpenAIEmbeddings()
-    raise ValueError(f"Unsupported EMBED_PROVIDER: {EMBED_PROVIDER}. Use 'openai' or 'google'")
+    raise ValueError(
+        f"Unsupported EMBED_PROVIDER: {EMBED_PROVIDER}. Use 'openai' or 'google'"
+    )
 
 
 def new_qdrant_client() -> QdrantClient:
@@ -144,7 +151,9 @@ def new_qdrant_client() -> QdrantClient:
     return QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 
 
-def new_qdrant_vectorstore(client: QdrantClient, embeddings, expected_dim: int) -> QdrantVectorStore:
+def new_qdrant_vectorstore(
+    client: QdrantClient, embeddings, expected_dim: int
+) -> QdrantVectorStore:
     """
     Ensure collection exists with correct dimensionality and return a VectorStore.
     """
@@ -155,14 +164,22 @@ def new_qdrant_vectorstore(client: QdrantClient, embeddings, expected_dim: int) 
         existing_dim = info.config.params.vectors.size
         logger.info("Found collection '%s' with dim=%d", COLLECTION, existing_dim)
         if existing_dim != expected_dim:
-            logger.warning("Dimension mismatch: existing=%d expected=%d; recreating", existing_dim, expected_dim)
+            logger.warning(
+                "Dimension mismatch: existing=%d expected=%d; recreating",
+                existing_dim,
+                expected_dim,
+            )
             try:
                 client.delete_collection(COLLECTION)
                 client.create_collection(
                     collection_name=COLLECTION,
-                    vectors_config=VectorParams(size=expected_dim, distance=Distance.COSINE),
+                    vectors_config=VectorParams(
+                        size=expected_dim, distance=Distance.COSINE
+                    ),
                 )
-                logger.info("Recreated collection '%s' with dim=%d", COLLECTION, expected_dim)
+                logger.info(
+                    "Recreated collection '%s' with dim=%d", COLLECTION, expected_dim
+                )
             except Exception as e:
                 logger.exception("Failed to recreate collection '%s'", COLLECTION)
                 raise ValueError(
@@ -171,19 +188,28 @@ def new_qdrant_vectorstore(client: QdrantClient, embeddings, expected_dim: int) 
                     "or clear qdrant_data directory."
                 ) from e
     except Exception:
-        logger.info("Creating new collection '%s' with dim=%d", COLLECTION, expected_dim)
+        logger.info(
+            "Creating new collection '%s' with dim=%d", COLLECTION, expected_dim
+        )
         client.create_collection(
             collection_name=COLLECTION,
             vectors_config=VectorParams(size=expected_dim, distance=Distance.COSINE),
         )
 
     logger.info("Initializing QdrantVectorStore on '%s'", COLLECTION)
-    return QdrantVectorStore(client=client, collection_name=COLLECTION, embedding=embeddings, distance="Cosine")
+    return QdrantVectorStore(
+        client=client,
+        collection_name=COLLECTION,
+        embedding=embeddings,
+        distance="Cosine",
+    )
 
 
 def new_chat_model():
     """Build the chat LLM from environment config."""
-    logger.info("Initializing Chat LLM: model=%s temp=%.2f", OPENAI_MODEL, OPENAI_TEMPERATURE)
+    logger.info(
+        "Initializing Chat LLM: model=%s temp=%.2f", OPENAI_MODEL, OPENAI_TEMPERATURE
+    )
     return ChatOpenAI(model=OPENAI_MODEL, temperature=OPENAI_TEMPERATURE)
 
 
@@ -220,9 +246,15 @@ def get_qdrant_storage_info() -> dict:
         storage_info["collections_dir_exists"] = collections_dir.exists()
         storage_info["snapshots_dir_exists"] = snapshots_dir.exists()
         if collections_dir.exists():
-            storage_info["collection_count"] = len([d for d in collections_dir.iterdir() if d.is_dir()])
-        logger.debug("Qdrant data: size=%dB collections_dir=%s snapshots_dir=%s",
-                     size, collections_dir.exists(), snapshots_dir.exists())
+            storage_info["collection_count"] = len(
+                [d for d in collections_dir.iterdir() if d.is_dir()]
+            )
+        logger.debug(
+            "Qdrant data: size=%dB collections_dir=%s snapshots_dir=%s",
+            size,
+            collections_dir.exists(),
+            snapshots_dir.exists(),
+        )
 
     try:
         client = new_qdrant_client()
@@ -234,7 +266,8 @@ def get_qdrant_storage_info() -> dict:
             "indexed_vectors_count": collection_info.indexed_vectors_count,
             "dimensions": collection_info.config.params.vectors.size,
             "distance": collection_info.config.params.vectors.distance.name,
-            "dimension_match": collection_info.config.params.vectors.size == get_expected_dimension(),
+            "dimension_match": collection_info.config.params.vectors.size
+            == get_expected_dimension(),
         }
         logger.info("Fetched collection info: %s", storage_info["collection_info"])
     except Exception as e:

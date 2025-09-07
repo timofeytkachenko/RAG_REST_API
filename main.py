@@ -34,6 +34,7 @@ from utils import (
     write_hash_db,
 )
 
+
 # ---------- Logging setup ----------
 def _setup_logging(level: int = logging.INFO) -> None:
     """Configure root logger with a concise, production-friendly format."""
@@ -41,14 +42,16 @@ def _setup_logging(level: int = logging.INFO) -> None:
     datefmt = "%Y-%m-%d %H:%M:%S"
     logging.basicConfig(level=level, format=fmt, datefmt=datefmt)
 
+
 _setup_logging()
 logger = logging.getLogger("rag.api")
 
 
 class AppResources(TypedDict):
     """Container for app-scoped resources created in lifespan."""
+
     splitter: object  # RecursiveCharacterTextSplitter
-    llm: object       # BaseChatModel
+    llm: object  # BaseChatModel
     vectorstore: object  # QdrantVectorStore
     system_prompt: str
 
@@ -58,8 +61,11 @@ class AppResources(TypedDict):
 # -----------------------
 class QueryRequest(BaseModel):
     """User query request with retriever parameters."""
+
     question: str = Field(..., description="User query/question")
-    search_type: Literal["mmr", "similarity", "similarity_score_threshold"] = "similarity"
+    search_type: Literal["mmr", "similarity", "similarity_score_threshold"] = (
+        "similarity"
+    )
     k: int = 5
     fetch_k: int = 10
     lambda_mult: float = 1.0
@@ -69,12 +75,14 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     """LLM answer with provenance."""
+
     answer: str
     used_docs: List[str] = []
 
 
 class IngestScanResponse(BaseModel):
     """Ingestion/scan result summary."""
+
     added_chunks: int
     processed_files: int
 
@@ -100,18 +108,26 @@ async def lifespan(_: FastAPI):
         embeddings = get_embeddings()
         expected_dim = get_expected_dimension()
         client = new_qdrant_client()
-        vectorstore = new_qdrant_vectorstore(client=client, embeddings=embeddings, expected_dim=expected_dim)
+        vectorstore = new_qdrant_vectorstore(
+            client=client, embeddings=embeddings, expected_dim=expected_dim
+        )
         splitter = new_text_splitter()
         llm = new_chat_model()
     except Exception as e:
         logger.exception("Startup failed while initializing models/resources")
         raise
 
-    system_prompt = (
-        "You are an assistant that responds strictly based on the context from documents. "
-        "If there is no information, say that it's not available and suggest where to look for it. "
-        "At the end of your response, indicate the sources (file name/path)."
-    )
+    system_prompt = """
+        You act as a proctor AI embedded in a Retrieval-Augmented Generation (RAG) framework designed to assist examinees during exams. Your responsibilities include:
+        - Confirming that each question pertains directly to the exam or the specific documents retrieved for that question.
+        - When questions are confirmed exam-related, provide comprehensive, transparent, and courteous answers strictly based on the retrieved document content, integrating relevant details precisely.
+        - If the question lacks supporting context or is unclear, inform the user politely: "The system cannot answer this question based on current information. Please wait for a real proctor to respond in chat."
+        - For questions unrelated to the exam or beyond the document scope, reply with: "I have no information about the topic you asked. Kindly direct your queries to the proctor in the chat."
+        
+        Always maintain professionalism and avoid any information or assumptions outside the retrieved content.
+        
+        Remember, your role is to ensure that examinees receive reliable, context-aware assistance while clearly signalling when human intervention is necessary.
+        """
 
     resources: AppResources = {
         "splitter": splitter,
@@ -121,8 +137,12 @@ async def lifespan(_: FastAPI):
     }
 
     app.state.resources = resources  # type: ignore[attr-defined]
-    logger.info("Resources initialized: vectorstore=%s, splitter=%s, llm=%s",
-                type(vectorstore).__name__, type(splitter).__name__, type(llm).__name__)
+    logger.info(
+        "Resources initialized: vectorstore=%s, splitter=%s, llm=%s",
+        type(vectorstore).__name__,
+        type(splitter).__name__,
+        type(llm).__name__,
+    )
     logger.info("Startup completed in %.1f ms", (time.perf_counter() - t0) * 1e3)
 
     try:
@@ -137,6 +157,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 # -----------------------
 # Middleware for request logging with request_id and timing
 # -----------------------
@@ -150,8 +171,12 @@ async def log_requests(request: Request, call_next):
 
     # bind request_id to logger context (simple add as prefix)
     extra_prefix = f"[rid={request_id}] "
-    logger.info(extra_prefix + "-> %s %s from %s",
-                request.method, request.url.path, request.client.host if request.client else "-")
+    logger.info(
+        extra_prefix + "-> %s %s from %s",
+        request.method,
+        request.url.path,
+        request.client.host if request.client else "-",
+    )
 
     try:
         response: Response = await call_next(request)
@@ -160,8 +185,13 @@ async def log_requests(request: Request, call_next):
         raise
 
     dur_ms = (time.perf_counter() - start) * 1e3
-    logger.info(extra_prefix + "<- %s %s status=%s in %.1f ms",
-                request.method, request.url.path, getattr(response, "status_code", "?"), dur_ms)
+    logger.info(
+        extra_prefix + "<- %s %s status=%s in %.1f ms",
+        request.method,
+        request.url.path,
+        getattr(response, "status_code", "?"),
+        dur_ms,
+    )
     # Echo request_id back for tracing
     response.headers["X-Request-ID"] = request_id
     return response
@@ -207,7 +237,12 @@ def storage_info() -> Dict[str, object]:
     logger.info("Fetching storage info for collection=%s", COLLECTION)
     info = get_qdrant_storage_info()
     info.update(
-        {"data_dir": str(DATA_DIR), "state_dir": str(STATE_DIR), "collection_name": COLLECTION, "qdrant_url": QDRANT_URL}
+        {
+            "data_dir": str(DATA_DIR),
+            "state_dir": str(STATE_DIR),
+            "collection_name": COLLECTION,
+            "qdrant_url": QDRANT_URL,
+        }
     )
     return info
 
@@ -314,7 +349,9 @@ def ingest_scan(
     if docs_to_add:
         vectorstore.add_documents(docs_to_add)
         write_hash_db(hashes)
-        logger.info("Ingested %d chunks from %d updated files", len(docs_to_add), processed)
+        logger.info(
+            "Ingested %d chunks from %d updated files", len(docs_to_add), processed
+        )
     else:
         logger.info("No updates detected during scan")
 
@@ -333,29 +370,50 @@ def query(
     llm = resources["llm"]
     system_prompt = resources["system_prompt"]
 
-    logger.info("Query received: search_type=%s k=%d fetch_k=%d lambda=%.2f thr=%s",
-                req.search_type, req.k, req.fetch_k, req.lambda_mult, req.score_threshold)
+    logger.info(
+        "Query received: search_type=%s k=%d fetch_k=%d lambda=%.2f thr=%s",
+        req.search_type,
+        req.k,
+        req.fetch_k,
+        req.lambda_mult,
+        req.score_threshold,
+    )
 
     # Configure retriever
     if req.search_type == "mmr":
         retriever = vectorstore.as_retriever(
             search_type="mmr",
-            search_kwargs={"k": req.k, "fetch_k": req.fetch_k, "lambda_mult": req.lambda_mult},
+            search_kwargs={
+                "k": req.k,
+                "fetch_k": req.fetch_k,
+                "lambda_mult": req.lambda_mult,
+            },
         )
     elif req.search_type == "similarity":
-        retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": req.k})
+        retriever = vectorstore.as_retriever(
+            search_type="similarity", search_kwargs={"k": req.k}
+        )
     else:  # similarity_score_threshold
         kwargs = {"k": req.k}
         if req.score_threshold is not None:
             kwargs["score_threshold"] = req.score_threshold
-        retriever = vectorstore.as_retriever(search_type="similarity_score_threshold", search_kwargs=kwargs)
+        retriever = vectorstore.as_retriever(
+            search_type="similarity_score_threshold", search_kwargs=kwargs
+        )
 
     prompt = ChatPromptTemplate.from_messages(
-        [("system", system_prompt), ("human", "Question: {question}\n\nContext:\n{context}")]
+        [
+            ("system", system_prompt),
+            ("human", "Question: {question}\n\nContext:\n{context}"),
+        ]
     )
 
     t0 = time.perf_counter()
-    chain = ({"context": retriever | format_docs, "question": RunnablePassthrough()} | prompt | llm)
+    chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+    )
 
     # provenance
     docs = retriever.invoke(req.question)
