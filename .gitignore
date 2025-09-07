@@ -5,6 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
+.DS_Store
 
 # Virtual environments
 .venv
@@ -14,7 +15,7 @@ wheels/
 
 # Data directories
 state/
-qdrant_data/
+faiss_data/
 
 # Logs
 *.log

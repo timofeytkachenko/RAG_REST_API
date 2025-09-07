@@ -9,11 +9,10 @@ from pathlib import Path
 from typing import List
 
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_qdrant import QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from qdrant_client import QdrantClient
 
 from gemma import GemmaEmbeddings
 
@@ -25,20 +24,19 @@ logger = logging.getLogger("rag.utils")
 # -----------------------
 # Config
 # -----------------------
-API_TOKEN = os.getenv("API_TOKEN", "")
 DATA_DIR = Path(os.getenv("DATA_DIR", "./data"))
 STATE_DIR = Path(os.getenv("STATE_DIR", "./state"))
-QDRANT_DATA_DIR = Path(os.getenv("QDRANT_DATA_DIR", "./qdrant_data"))
+FAISS_INDEX_DIR = Path(os.getenv("FAISS_INDEX_DIR", "./faiss_data"))
 
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
-QDRANT_DATA_DIR.mkdir(parents=True, exist_ok=True)
+FAISS_INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
 HASH_DB = STATE_DIR / "file_hashes.json"
 COLLECTION = os.getenv("COLLECTION", "docs_rag")
 
-QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", None)
+FAISS_INDEX_PATH = FAISS_INDEX_DIR / f"{COLLECTION}.faiss"
+FAISS_METADATA_PATH = FAISS_INDEX_DIR / f"{COLLECTION}.pkl"
 
 EMBED_PROVIDER = os.getenv("EMBED_PROVIDER", "openai")  # "openai" or "google"
 HF_TOKEN = os.getenv("HF_TOKEN", "")
@@ -109,7 +107,7 @@ def load_docs_from_path(path: Path) -> List[Document]:
 def new_text_splitter() -> RecursiveCharacterTextSplitter:
     """Create a robust recursive splitter for mixed prose/code."""
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
+        chunk_size=200,
         chunk_overlap=50,
         add_start_index=True,
         separators=["\n\n", "\n", " ", ""],
@@ -145,64 +143,59 @@ def get_embeddings():
     )
 
 
-def new_qdrant_client() -> QdrantClient:
-    """Create a Qdrant client for the configured URL/API key."""
-    logger.info("Creating Qdrant client: url=%s", QDRANT_URL)
-    return QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+def get_faiss_index_path() -> tuple[Path, Path]:
+    """Get FAISS index and metadata file paths."""
+    return FAISS_INDEX_PATH, FAISS_METADATA_PATH
 
 
-def new_qdrant_vectorstore(
-    client: QdrantClient, embeddings, expected_dim: int
-) -> QdrantVectorStore:
+def new_faiss_vectorstore(embeddings) -> FAISS:
     """
-    Ensure collection exists with correct dimensionality and return a VectorStore.
-    """
-    from qdrant_client.models import Distance, VectorParams
+    Create or load FAISS vectorstore from disk.
 
-    try:
-        info = client.get_collection(COLLECTION)
-        existing_dim = info.config.params.vectors.size
-        logger.info("Found collection '%s' with dim=%d", COLLECTION, existing_dim)
-        if existing_dim != expected_dim:
-            logger.warning(
-                "Dimension mismatch: existing=%d expected=%d; recreating",
-                existing_dim,
-                expected_dim,
+    Parameters
+    ----------
+    embeddings : Embeddings
+        Embedding model (OpenAI or Google).
+
+    Returns
+    -------
+    FAISS
+        Ready-to-use FAISS vector store.
+    """
+    index_path, metadata_path = get_faiss_index_path()
+
+    if index_path.exists() and metadata_path.exists():
+        try:
+            logger.info("Loading existing FAISS index from %s", index_path)
+            vectorstore = FAISS.load_local(
+                str(FAISS_INDEX_DIR),
+                embeddings,
+                COLLECTION,
+                allow_dangerous_deserialization=True,
             )
-            try:
-                client.delete_collection(COLLECTION)
-                client.create_collection(
-                    collection_name=COLLECTION,
-                    vectors_config=VectorParams(
-                        size=expected_dim, distance=Distance.COSINE
-                    ),
-                )
-                logger.info(
-                    "Recreated collection '%s' with dim=%d", COLLECTION, expected_dim
-                )
-            except Exception as e:
-                logger.exception("Failed to recreate collection '%s'", COLLECTION)
-                raise ValueError(
-                    "Cannot recreate collection: dimension mismatch persists. "
-                    "Use a different COLLECTION (e.g., COLLECTION=docs_openai) "
-                    "or clear qdrant_data directory."
-                ) from e
-    except Exception:
-        logger.info(
-            "Creating new collection '%s' with dim=%d", COLLECTION, expected_dim
-        )
-        client.create_collection(
-            collection_name=COLLECTION,
-            vectors_config=VectorParams(size=expected_dim, distance=Distance.COSINE),
-        )
+            logger.info(
+                "FAISS index loaded successfully with %d vectors",
+                vectorstore.index.ntotal,
+            )
+            return vectorstore
+        except Exception as e:
+            logger.warning(
+                "Failed to load existing FAISS index: %s. Creating new one.", e
+            )
 
-    logger.info("Initializing QdrantVectorStore on '%s'", COLLECTION)
-    return QdrantVectorStore(
-        client=client,
-        collection_name=COLLECTION,
-        embedding=embeddings,
-        distance="Cosine",
+    # Create new empty FAISS index
+    logger.info("Creating new FAISS index")
+    # Create with a dummy document to initialize the index
+    dummy_doc = Document(
+        page_content="Initialize FAISS index", metadata={"source": "init"}
     )
+    vectorstore = FAISS.from_documents([dummy_doc], embeddings)
+
+    # Save the index (will be empty after first real document ingestion)
+    vectorstore.save_local(str(FAISS_INDEX_DIR), COLLECTION)
+    logger.info("New FAISS index created and saved")
+
+    return vectorstore
 
 
 def new_chat_model():
@@ -224,69 +217,63 @@ def format_docs(docs: List[Document]) -> str:
     return "\n\n---\n\n".join(chunks)
 
 
-def get_qdrant_storage_info() -> dict:
-    """Inspect Qdrant data dir size and remote collection state."""
+def get_faiss_storage_info() -> dict:
+    """Get information about FAISS storage directory and index."""
+    index_path, metadata_path = get_faiss_index_path()
+
     storage_info = {
-        "qdrant_data_dir": str(QDRANT_DATA_DIR),
-        "qdrant_data_exists": QDRANT_DATA_DIR.exists(),
-        "qdrant_data_size_bytes": 0,
-        "collections_dir_exists": False,
-        "snapshots_dir_exists": False,
-        "collection_count": 0,
+        "faiss_index_dir": str(FAISS_INDEX_DIR),
+        "faiss_index_exists": index_path.exists(),
+        "faiss_metadata_exists": metadata_path.exists(),
+        "faiss_index_size_bytes": 0,
         "current_embed_provider": EMBED_PROVIDER,
         "expected_dimensions": get_expected_dimension(),
-        "collection_info": {},
+        "collection_name": COLLECTION,
+        "index_info": {},
     }
 
-    if QDRANT_DATA_DIR.exists():
-        size = sum(f.stat().st_size for f in QDRANT_DATA_DIR.rglob("*") if f.is_file())
-        storage_info["qdrant_data_size_bytes"] = size
-        collections_dir = QDRANT_DATA_DIR / "collections"
-        snapshots_dir = QDRANT_DATA_DIR / "snapshots"
-        storage_info["collections_dir_exists"] = collections_dir.exists()
-        storage_info["snapshots_dir_exists"] = snapshots_dir.exists()
-        if collections_dir.exists():
-            storage_info["collection_count"] = len(
-                [d for d in collections_dir.iterdir() if d.is_dir()]
-            )
-        logger.debug(
-            "Qdrant data: size=%dB collections_dir=%s snapshots_dir=%s",
-            size,
-            collections_dir.exists(),
-            snapshots_dir.exists(),
+    if FAISS_INDEX_DIR.exists():
+        # Calculate total size
+        storage_info["faiss_index_size_bytes"] = sum(
+            f.stat().st_size for f in FAISS_INDEX_DIR.rglob("*") if f.is_file()
         )
 
+    # Try to get index info
     try:
-        client = new_qdrant_client()
-        collection_info = client.get_collection(COLLECTION)
-        storage_info["collection_info"] = {
-            "name": COLLECTION,
-            "status": collection_info.status.name,
-            "vectors_count": collection_info.vectors_count,
-            "indexed_vectors_count": collection_info.indexed_vectors_count,
-            "dimensions": collection_info.config.params.vectors.size,
-            "distance": collection_info.config.params.vectors.distance.name,
-            "dimension_match": collection_info.config.params.vectors.size
-            == get_expected_dimension(),
-        }
-        logger.info("Fetched collection info: %s", storage_info["collection_info"])
+        if index_path.exists() and metadata_path.exists():
+            embeddings = get_embeddings()
+            vectorstore = FAISS.load_local(
+                str(FAISS_INDEX_DIR),
+                embeddings,
+                COLLECTION,
+                allow_dangerous_deserialization=True,
+            )
+
+            storage_info["index_info"] = {
+                "name": COLLECTION,
+                "vectors_count": vectorstore.index.ntotal,
+                "dimensions": vectorstore.index.d,
+                "dimension_match": vectorstore.index.d == get_expected_dimension(),
+                "index_type": type(vectorstore.index).__name__,
+            }
+        else:
+            storage_info["index_info"] = {
+                "error": "Index files not found",
+                "index_exists": False,
+            }
     except Exception as e:
-        storage_info["collection_info"] = {
-            "error": f"Could not retrieve collection info: {str(e)}",
-            "collection_exists": False,
+        storage_info["index_info"] = {
+            "error": f"Could not load index info: {str(e)}",
+            "index_exists": False,
         }
-        logger.warning("Could not retrieve collection info: %s", e)
 
     return storage_info
 
 
-def ensure_qdrant_directories() -> None:
-    """Ensure Qdrant data subdirs exist; suppress errors (Qdrant may create them)."""
-    collections_dir = QDRANT_DATA_DIR / "collections"
-    snapshots_dir = QDRANT_DATA_DIR / "snapshots"
+def ensure_faiss_directories() -> None:
+    """Ensure FAISS index directory exists."""
     try:
-        collections_dir.mkdir(parents=True, exist_ok=True)
-        snapshots_dir.mkdir(parents=True, exist_ok=True)
-        logger.debug("Ensured qdrant directories exist")
+        FAISS_INDEX_DIR.mkdir(parents=True, exist_ok=True)
+        logger.debug("FAISS index directory ensured: %s", FAISS_INDEX_DIR)
     except OSError as e:
-        logger.warning("Could not create Qdrant directories: %s", e)
+        logger.warning("Could not create FAISS directories: %s", e)

@@ -16,19 +16,17 @@ from pydantic import BaseModel, Field
 from utils import (
     COLLECTION,
     DATA_DIR,
-    QDRANT_URL,
+    FAISS_INDEX_DIR,
     STATE_DIR,
     compute_hash_bytes,
     compute_hash_file,
-    ensure_qdrant_directories,
+    ensure_faiss_directories,
     format_docs,
     get_embeddings,
-    get_expected_dimension,
-    get_qdrant_storage_info,
+    get_faiss_storage_info,
     load_docs_from_path,
     new_chat_model,
-    new_qdrant_client,
-    new_qdrant_vectorstore,
+    new_faiss_vectorstore,
     new_text_splitter,
     read_hash_db,
     write_hash_db,
@@ -97,20 +95,16 @@ async def lifespan(_: FastAPI):
 
     Notes
     -----
-    - Validates Qdrant collection dimensionality against chosen embedding model.
+    - Initializes FAISS vector store with chosen embedding model.
     - Stores initialized resources in `app.state.resources`.
     """
     t0 = time.perf_counter()
     logger.info("App startup: initializing resources...")
-    ensure_qdrant_directories()
+    ensure_faiss_directories()
 
     try:
         embeddings = get_embeddings()
-        expected_dim = get_expected_dimension()
-        client = new_qdrant_client()
-        vectorstore = new_qdrant_vectorstore(
-            client=client, embeddings=embeddings, expected_dim=expected_dim
-        )
+        vectorstore = new_faiss_vectorstore(embeddings=embeddings)
         splitter = new_text_splitter()
         llm = new_chat_model()
     except Exception as e:
@@ -233,15 +227,14 @@ def health() -> Dict[str, str]:
 
 @app.get("/storage/info")
 def storage_info() -> Dict[str, object]:
-    """Inspect Qdrant storage & collection info."""
+    """Inspect FAISS storage & index info."""
     logger.info("Fetching storage info for collection=%s", COLLECTION)
-    info = get_qdrant_storage_info()
+    info = get_faiss_storage_info()
     info.update(
         {
             "data_dir": str(DATA_DIR),
             "state_dir": str(STATE_DIR),
             "collection_name": COLLECTION,
-            "qdrant_url": QDRANT_URL,
         }
     )
     return info
@@ -296,6 +289,8 @@ async def ingest_upload(
 
     if docs_to_add:
         vectorstore.add_documents(docs_to_add)
+        # Save FAISS index to disk after adding documents
+        vectorstore.save_local(str(FAISS_INDEX_DIR), COLLECTION)
         write_hash_db(hashes)
         logger.info("Ingested %d chunks from %d files", len(docs_to_add), processed)
     else:
@@ -348,6 +343,8 @@ def ingest_scan(
 
     if docs_to_add:
         vectorstore.add_documents(docs_to_add)
+        # Save FAISS index to disk after adding documents
+        vectorstore.save_local(str(FAISS_INDEX_DIR), COLLECTION)
         write_hash_db(hashes)
         logger.info(
             "Ingested %d chunks from %d updated files", len(docs_to_add), processed

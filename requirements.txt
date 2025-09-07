@@ -2,12 +2,11 @@ fastapi
 uvicorn[standard]
 python-multipart
 pydantic
-qdrant-client
+faiss-cpu
 langchain
 langchain-openai
 langchain-text-splitters
 langchain-community
-langchain-qdrant
 pypdf
 sentence-transformers
 huggingface_hub
