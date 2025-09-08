@@ -1,6 +1,3 @@
-# utils.py
-from __future__ import annotations
-
 import hashlib
 import json
 import logging
@@ -8,6 +5,7 @@ import os
 from pathlib import Path
 from typing import List
 
+from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
@@ -15,6 +13,8 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from gemma import GemmaEmbeddings
+
+load_dotenv()
 
 # -----------------------
 # Logging
@@ -46,6 +46,11 @@ GOOGLE_GEMMA_DIMENSION = 768
 
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 OPENAI_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0"))
+
+API_BASE_URL = os.getenv("API_BASE_URL", "")
+API_KEY = os.getenv("API_KEY", "")
+MODEL_NAME = os.getenv("MODEL_NAME", "")
+PROJECT_SERVICE_TOKEN = os.getenv("PROJECT_SERVICE_TOKEN", "")
 
 
 def compute_hash_bytes(data: bytes) -> str:
@@ -199,11 +204,29 @@ def new_faiss_vectorstore(embeddings) -> FAISS:
 
 
 def new_chat_model():
-    """Build the chat LLM from environment config."""
-    logger.info(
-        "Initializing Chat LLM: model=%s temp=%.2f", OPENAI_MODEL, OPENAI_TEMPERATURE
+    """Build the chat LLM (Qwen via OpenAI-compatible endpoint) from env config.
+
+    Environment variables used:
+    - API_BASE_URL: Provider base URL (will be normalized to end with '/v1')
+    - API_KEY: Bearer token for Authorization header
+    - MODEL_NAME: Model identifier to use (falls back to OPENAI_MODEL)
+    - PROJECT_SERVICE_TOKEN: Optional additional header 'Grace-Client-Secret'
+    - OPENAI_TEMPERATURE: Generation temperature (float)
+    """
+    if not MODEL_NAME:
+        raise RuntimeError("MODEL_NAME is not set. Configure MODEL_NAME")
+
+    logger.info("Initializing Chat LLM (Qwen): model=%s", MODEL_NAME)
+
+    headers = {"Grace-Client-Secret": PROJECT_SERVICE_TOKEN}
+
+    return ChatOpenAI(
+        model=MODEL_NAME,
+        temperature=OPENAI_TEMPERATURE,
+        api_key=API_KEY or None,
+        base_url=API_BASE_URL,
+        default_headers=headers,
     )
-    return ChatOpenAI(model=OPENAI_MODEL, temperature=OPENAI_TEMPERATURE)
 
 
 def format_docs(docs: List[Document]) -> str:
